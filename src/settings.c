@@ -68,10 +68,8 @@ static gboolean          reloadScreenSettings (ScreenInfo *,
                                                int, gchar *theme);
 static void              parseShortcut        (ScreenInfo *,
                                                int,
-                                               const gchar *,
-                                               GList *);
-static const gchar      *getShortcut          (const gchar *,
-                                               GList *);
+                                               const gchar *);
+static const gchar      *getShortcut          (const gchar *);
 
 static void
 update_grabs (ScreenInfo *screen_info)
@@ -661,10 +659,25 @@ loadKeyBindings (ScreenInfo *screen_info)
         parseShortcut (screen_info, KEY_WORKSPACE_1 + i, keyname, shortcuts);
     }
 
-    xfce_shortcuts_free (shortcuts);
+    xfce_shortcuts_free (shortcuts); */
+
+    parseShortcut (screen_info, KEY_CLOSE_WINDOW, "close_window_key");
+    parseShortcut (screen_info, KEY_CYCLE_WINDOWS, "cycle_windows_key");
+    parseShortcut (screen_info, KEY_CYCLE_REVERSE_WINDOWS, "cycle_reverse_windows_key");
+    parseShortcut (screen_info, KEY_MOVE, "move_window_key");
+    parseShortcut (screen_info, KEY_RESIZE, "resize_window_key");
+    parseShortcut (screen_info, KEY_MAXIMIZE_WINDOW, "maximize_window_key");
+    //parseShortcut (screen_info, KEY_POPUP_MENU, "popup_menu_key");
+    parseShortcut (screen_info, KEY_TOGGLE_FULLSCREEN, "fullscreen_key");
+
+/*    for (i = 0; i < 12; i++)
+    {
+        g_snprintf(keyname, sizeof (keyname), "workspace_%d_key", i + 1);
+        parseShortcut (screen_info, KEY_WORKSPACE_1 + i, keyname);
+    } */
 
     myScreenUngrabKeys (screen_info);
-    myScreenGrabKeys (screen_info); */
+    myScreenGrabKeys (screen_info);
 
     return;
 }
@@ -1554,30 +1567,79 @@ cb_shortcut_removed (XfceShortcutsProvider *provider, const gchar *shortcut,
 */
 
 static void
-parseShortcut (ScreenInfo *screen_info, int id, const gchar *name,
-               GList *shortcuts)
+parseShortcut (ScreenInfo *screen_info, int id, const gchar *name)
 {
-/*    Display *dpy;
+    Display *dpy;
     const gchar *shortcut;
 
     g_return_if_fail (screen_info);
     g_return_if_fail (id >= 0 && id < KEY_COUNT);
 
+    //g_warning("parseShortcut");
     dpy = myScreenGetXDisplay (screen_info);
-    shortcut = getShortcut (name, shortcuts);
+    //g_warning("parseShortcut name %s", name);
+
+    shortcut = getShortcut (name);
+    //g_warning("parseShortcut shortcut %s", shortcut);
     parseKeyString (dpy, &screen_info->params->keys[id], shortcut);
 
-    screen_info->params->keys[id].internal_name = g_strdup (name); */
+    screen_info->params->keys[id].internal_name = g_strdup (name);
 }
 
 static const gchar *
-getShortcut (const gchar *name, GList *shortcuts)
+getShortcut (const gchar *name)
 {
 /*    XfceShortcut *shortcut;
-    GList *iter;
+    GList *iter; */
     const gchar *result = NULL;
+    //g_warning("getShortcut %s", name);
+    
+    if (g_str_equal (name, "close_window_key") == TRUE) {
+		result = ("<Alt>F4");
+	}
 
-    for (iter = shortcuts; iter != NULL; iter = g_list_next (iter))
+    if (g_str_equal (name, "cycle_windows_key") == TRUE) {
+		result = ("<Alt>Tab");
+	}
+
+    if (g_str_equal (name, "cycle_reverse_windows_key") == TRUE) {
+		result = ("<Alt><Shift>Tab");
+	}
+
+    if (g_str_equal (name, "move_window_key") == TRUE) {
+		result = ("<Alt>F7");
+	}
+
+    if (g_str_equal (name, "resize_window_key") == TRUE) {
+		result = ("<Alt>F8");
+	}
+
+    if (g_str_equal (name, "maximize_window_key") == TRUE) {
+		result = ("<Alt>F10");
+	}
+
+    if (g_str_equal (name, "popup_menu_key") == TRUE) {
+		result = ("<Alt>space");
+	}
+
+    if (g_str_equal (name, "fullscreen_key") == TRUE) {
+		result = ("<Alt>F11");
+	}
+
+    if (g_str_equal (name, "workspace_1_key") == TRUE) { result = ("<Primary>F1"); }
+    if (g_str_equal (name, "workspace_2_key") == TRUE) { result = ("<Primary>F2"); }
+    if (g_str_equal (name, "workspace_3_key") == TRUE) { result = ("<Primary>F3"); }
+    if (g_str_equal (name, "workspace_4_key") == TRUE) { result = ("<Primary>F4"); }
+    if (g_str_equal (name, "workspace_5_key") == TRUE) { result = ("<Primary>F5"); }
+    if (g_str_equal (name, "workspace_6_key") == TRUE) { result = ("<Primary>F6"); }
+    if (g_str_equal (name, "workspace_7_key") == TRUE) { result = ("<Primary>F7"); }
+    if (g_str_equal (name, "workspace_8_key") == TRUE) { result = ("<Primary>F8"); }
+    if (g_str_equal (name, "workspace_9_key") == TRUE) { result = ("<Primary>F9"); }
+    if (g_str_equal (name, "workspace_10_key") == TRUE) { result = ("<Primary>F10"); }
+    if (g_str_equal (name, "workspace_11_key") == TRUE) { result = ("<Primary>F11"); }
+    if (g_str_equal (name, "workspace_12_key") == TRUE) { result = ("<Primary>F12"); }
+
+/*    for (iter = shortcuts; iter != NULL; iter = g_list_next (iter))
     {
         shortcut = iter->data;
 
@@ -1586,7 +1648,7 @@ getShortcut (const gchar *name, GList *shortcuts)
             result = shortcut->shortcut;
             break;
         }
-    }
+    } */
 
-    return result; */
+    return result;
 }
