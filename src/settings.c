@@ -48,6 +48,14 @@
 #define XPM_COLOR_SYMBOL_SIZE   24
 
 #define KEYMAP_UPDATE_TIMEOUT   250 /* ms */
+
+typedef enum
+{
+    STANDARD_ICON_GRID,
+    OVERFLOW_COLUMN_GRID,
+}
+CYCLE_TABWIN_MODE;
+
 static guint keymap_timeout   = 0;
 
 /* Forward static decls. */
@@ -1116,6 +1124,7 @@ initSettings (ScreenInfo *screen_info, gchar *theme)
         screen_info->workspace_names_items = 0;
     }
 
+screen_info->params->cycle_tabwin_mode = OVERFLOW_COLUMN_GRID;
     getDesktopLayout(display_info, screen_info->xroot, screen_info->workspace_count, &screen_info->desktop_layout);
     placeSidewalks (screen_info, screen_info->params->wrap_workspaces);
 
