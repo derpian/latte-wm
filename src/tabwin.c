@@ -216,7 +216,6 @@ paint_selected (GtkWidget *w, GdkEventExpose *event, gpointer user_data)
     TabwinWidget *tabwin_widget = user_data;
 
     g_return_val_if_fail (GTK_IS_WIDGET(w), FALSE);
-    TRACE ("entering paint_selected");
 
     if (w == tabwin_widget->hovered)
     {
@@ -303,6 +302,9 @@ tabwinSetSelected (TabwinWidget *tabwin_widget, GtkWidget *w, GtkWidget *l)
                                                G_CALLBACK (paint_selected),
                                                tabwin_widget);
 
+gtk_widget_set_state (w, GTK_STATE_SELECTED);
+gtk_button_set_relief (GTK_BUTTON (w), GTK_RELIEF_NORMAL);
+
     c = g_object_get_data (G_OBJECT (tabwin_widget->selected), "client-ptr-val");
 
     if (c != NULL)
@@ -340,6 +342,7 @@ tabwinSelectWidget (Tabwin *tabwin)
             buttonbox = GTK_WIDGET (gtk_container_get_children (GTK_CONTAINER (window_button))[0].data );
             buttonlabel = GTK_WIDGET (g_list_nth_data (gtk_container_get_children (GTK_CONTAINER(buttonbox)), 1) );
             gtk_label_set_text (GTK_LABEL (buttonlabel), "");
+            gtk_widget_set_sensitive(GTK_WIDGET(window_button), FALSE);
 
             if (gtk_widget_is_focus (window_button))
             {
@@ -413,7 +416,7 @@ getMinMonitorHeight (ScreenInfo *screen_info)
 static gboolean
 cb_window_button_enter (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-    TabwinWidget *tabwin_widget = user_data;
+/*    TabwinWidget *tabwin_widget = user_data;
     Client *c;
     GtkWidget *buttonbox, *buttonlabel;
     gchar *classname;
@@ -421,22 +424,22 @@ cb_window_button_enter (GtkWidget *widget, GdkEvent *event, gpointer user_data)
     TRACE ("entering");
 
     g_return_val_if_fail (tabwin_widget != NULL, FALSE);
-
+*/
     /* keep track of which widget we're hovered over */
-    tabwin_widget->hovered = widget;
+//    tabwin_widget->hovered = widget;
 
-    c = g_object_get_data (G_OBJECT (widget), "client-ptr-val");
+//    c = g_object_get_data (G_OBJECT (widget), "client-ptr-val");
 
     /* when hovering over a window icon, display it's label but don't
      * select it */
-    if (c != NULL)
+/*    if (c != NULL)
     {
         if (gtk_widget_is_focus (widget))
         {
             gtk_widget_set_state (widget, GTK_STATE_ACTIVE);
         }
 
-        /* we don't update the labels on mouse over for this mode */
+        // we don't update the labels on mouse over for this mode
         if (c->screen_info->params->cycle_tabwin_mode == OVERFLOW_COLUMN_GRID)
         {
             return FALSE;
@@ -448,7 +451,7 @@ cb_window_button_enter (GtkWidget *widget, GdkEvent *event, gpointer user_data)
         classname = g_strdup (c->class.res_class);
         tabwinSetLabel (tabwin_widget, buttonlabel, classname, c->name, c->win_workspace);
         g_free (classname);
-    }
+    } */
 
     return FALSE;
 }
@@ -456,17 +459,17 @@ cb_window_button_enter (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 static gboolean
 cb_window_button_leave (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-    TabwinWidget *tabwin_widget = user_data;
+/*    TabwinWidget *tabwin_widget = user_data;
     Client *c;
 
     TRACE ("entering");
 
     g_return_val_if_fail (tabwin_widget != NULL, FALSE);
 
-    tabwin_widget->hovered = NULL;
+    tabwin_widget->hovered = NULL; */
 
     /* don't do anything if we have the focus */
-    if (gtk_widget_is_focus (widget))
+/*    if (gtk_widget_is_focus (widget))
     {
         gtk_widget_set_state (widget, GTK_STATE_SELECTED);
         return FALSE;
@@ -474,19 +477,19 @@ cb_window_button_leave (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 
     c = g_object_get_data (G_OBJECT (widget), "client-ptr-val");
 
-    /* when hovering over a window icon, display it's label but don't
-     * select it */
+    // when hovering over a window icon, display it's label but don't
+    // select it
     if (c != NULL)
     {
-        /* we don't update the labels for this mode */
+        // we don't update the labels for this mode
         if (c->screen_info->params->cycle_tabwin_mode == OVERFLOW_COLUMN_GRID)
         {
             return FALSE;
         }
 
-        /* reselect the selected widget, it will clear everything else out */
+        // reselect the selected widget, it will clear everything else out
         tabwinSelectWidget (tabwin_widget->tabwin);
-    }
+    } */
 
     return FALSE;
 }
@@ -533,6 +536,7 @@ createWindowlist (ScreenInfo *screen_info, TabwinWidget *tabwin_widget)
         icon_list = g_list_next (icon_list);
 
         window_button = gtk_button_new ();
+        gtk_widget_set_sensitive(GTK_WIDGET(window_button), FALSE);
         gtk_button_set_relief (GTK_BUTTON (window_button), GTK_RELIEF_NONE);
         g_object_set_data (G_OBJECT (window_button), "client-ptr-val", c);
         g_signal_connect (window_button, "enter-notify-event",
@@ -568,6 +572,7 @@ createWindowlist (ScreenInfo *screen_info, TabwinWidget *tabwin_widget)
             }
             buttonbox = gtk_hbox_new (FALSE, 6);
             buttonlabel = gtk_label_new (c->name);
+            gtk_style_context_add_class (gtk_widget_get_style_context(GTK_WIDGET(buttonlabel)), "tabslabel");
             gtk_misc_set_alignment (GTK_MISC (buttonlabel), 0, 0.5);
 
             gtk_misc_set_alignment (GTK_MISC (icon), 0.5, 0.5);
@@ -924,11 +929,14 @@ tabwinChange2Selected (Tabwin *tabwin, GList *selected)
                 }
                 else if (window_button == tabwin_widget->hovered)
                 {
-                    gtk_widget_set_state (window_button, GTK_STATE_PRELIGHT);
+                    //gtk_widget_set_state (window_button, GTK_STATE_PRELIGHT);
+                    gtk_widget_set_state (window_button, GTK_STATE_NORMAL);
+                    gtk_widget_set_sensitive(GTK_WIDGET(window_button), FALSE);
                 }
                 else
                 {
                     gtk_widget_set_state (window_button, GTK_STATE_NORMAL);
+                    gtk_widget_set_sensitive(GTK_WIDGET(window_button), FALSE);
                 }
             }
         }
@@ -1062,7 +1070,7 @@ tabwinSelectHead (Tabwin *tabwin)
             buttonlabel = GTK_WIDGET (g_list_nth_data (gtk_container_get_children (GTK_CONTAINER (buttonbox)), 1) );
             if (((Client *) g_object_get_data (G_OBJECT (window_button), "client-ptr-val")) == head->data)
             {
-                tabwinSetSelected (tabwin_widget, window_button, buttonlabel);
+                //tabwinSetSelected (tabwin_widget, window_button, buttonlabel);
                 gtk_widget_queue_draw (GTK_WIDGET (tabwin_widget));
             }
         }
